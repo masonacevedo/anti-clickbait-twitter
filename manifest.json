@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "Reduced Clickbait Twitter",
+    "version": "1.0",
+    "description": "Makes tweets transparent according to how clickbait-y, persuade-y, and market-y it is.",
+    "content_scripts": [
+        {
+            "matches" : ["*://twitter.com/*",
+                        "*://x.com/*",
+                        "*://mobile.twitter.com/*",
+                        "*://mobile.x.com/*"
+            ],
+            "js": ["content.js"],
+            "runat": "document_idle"
+        }
+    ]
+}
