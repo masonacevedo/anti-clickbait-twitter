@@ -5,6 +5,7 @@ import tweepy
 # Make sure to set these as environment variables
 client_id = os.environ.get("TWITTER_CLIENT_ID")
 client_secret = os.environ.get("TWITTER_CLIENT_SECRET")
+print(os.environ.get("OAUTHLIB_INSECURE_TRANSPORT"))
 
 if not client_id or not client_secret:
     raise Exception(
@@ -16,7 +17,7 @@ if not client_id or not client_secret:
 # Scopes determine what permissions your app is requesting.
 oauth2_handler = tweepy.OAuth2UserHandler(
     client_id=client_id,
-    redirect_uri="https://www.example.com",  # Or "http://127.0.0.1:3000"
+    redirect_uri="http://localhost:8080/callback",  # Or "http://127.0.0.1:3000"
     scope=["tweet.read", "users.read", "timeline.read"],
     client_secret=client_secret,
 )
