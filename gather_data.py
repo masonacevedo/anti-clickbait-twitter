@@ -31,10 +31,26 @@ client = tweepy.Client(access_token, consumer_key=client_id, consumer_secret=cli
 user_id = os.environ.get("MY_TWITTER_USER_ID")
 
 
-response = client.get_bookmarks(max_results=10)
+response = client.get_bookmarks(
+    max_results=10,
+    expansions=["attachments.media_keys"],
+    media_fields=["url", "type", "preview_image_url"]
+)
+
+media_dict = {}
+if "media" in response.includes:
+    for media in response.includes["media"]:
+        media_dict[media.media_key] = media
 
 if response.data:
     for tweet in response.data:
         print(f"ID: {tweet.id} - Text: {tweet.text}")
+        if tweet.attachments and "media_keys" in tweet.attachments:
+            for media_key in tweet.attachments["media_keys"]:
+                media = media_dict.get(media_key)
+                if media and media.type == "photo":
+                    print("Image URL:", media.url)
+                elif media and media.type == "video":
+                    print("Video preview image:", media.preview_image_url)
 else:
     print("Something went wrong.")
