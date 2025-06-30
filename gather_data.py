@@ -27,11 +27,11 @@ oauth2_handler.fetch_token(redirect_response)
 access_token = oauth2_handler.access_token
 refresh_token = oauth2_handler.refresh_token
 
-client = tweepy.Client(bearer_token=os.environ.get("TWITTER_BEARER_TOKEN"))
+client = tweepy.Client(access_token, consumer_key=client_id, consumer_secret=client_secret)
 user_id = os.environ.get("MY_TWITTER_USER_ID")
 
 
-response = client.get_bookmarks(user_id=user_id, max_results=10)
+response = client.get_bookmarks(max_results=10)
 
 if response.data:
     for tweet in response.data:
