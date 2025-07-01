@@ -107,7 +107,7 @@ while total_fetched < max_total:
         break
     print("pagination token at end:", pagination_token)
     print("\n\n\n")
-    time.sleep(1)  # Be nice to the API
+    time.sleep(3)  # Be nice to the API
 
 # Save all tweet data
 with open("bookmarked_tweets.json", "w") as f:
