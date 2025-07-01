@@ -40,8 +40,12 @@ pagination_token = None
 if os.path.exists("last_pagination_token.txt"):
     with open("last_pagination_token.txt", "r") as f:
         pagination_token = f.read().strip()
+output_file_name = "bookmarked_tweets.json"
+with open(output_file_name, "r") as f:
+    all_tweets = json.load(f)
 
-all_tweets = []
+seen_ids = [tweet.get('id') for tweet in all_tweets]
+
 pagination_token = None
 total_fetched = 0
 max_total = 1000  # Twitter API may limit to 800, but try 1000
@@ -50,6 +54,8 @@ BATCH_SIZE = 100
 print("Fetching up to 1000 bookmarked tweets in batches of 100...")
 
 while total_fetched < max_total:
+    print('continuing from tippy top...')
+    input('press enter to continue!')
     print("pagination token at beginning:", pagination_token)
     response = client.get_bookmarks(
         max_results=BATCH_SIZE,
@@ -64,7 +70,12 @@ while total_fetched < max_total:
             media_dict[media.media_key] = media
 
     if response.data:
+        
         for tweet in response.data:
+            print("continuing from inside...")
+            if tweet.id in seen_ids:
+                print("about to skip")
+                continue
             tweet_info = {
                 "id": tweet.id,
                 "text": getattr(tweet, "text", None),
@@ -110,7 +121,7 @@ while total_fetched < max_total:
     time.sleep(3)  # Be nice to the API
 
 # Save all tweet data
-with open("bookmarked_tweets.json", "w") as f:
+with open(output_file_name, "w") as f:
     json.dump(all_tweets, f, indent=2)
 
 # Save the last pagination token for future use
