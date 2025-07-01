@@ -20,6 +20,8 @@ for index, tweet in enumerate(d):
     if tweet.get('id') in existing_ids:
         continue
     clickbait_score = input("Please input a 0, 1, or 2, or 3(0=not clickbait, 1=sorta clickbait, 2=definitely clickbait, 3=not sure):")
+    if clickbait_score not in ["0", "1", "2", "3"]:
+        raise Exception("Invalid score!!")
     labeled_tweet = copy.deepcopy(tweet)
     labeled_tweet["score"] = clickbait_score
     labeled_tweets.append(labeled_tweet)
