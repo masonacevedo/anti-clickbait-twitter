@@ -42,7 +42,7 @@ pagination_token = None
 if os.path.exists("last_pagination_token.txt"):
     with open("last_pagination_token.txt", "r") as f:
         pagination_token = f.read().strip()
-output_file_name = "bookmarked_tweets.json"
+output_file_name = "bookmarked_tweets_v2.json"
 with open(output_file_name, "r") as f:
     all_tweets = json.load(f)
 
@@ -90,11 +90,14 @@ while total_fetched < max_total:
                     if media:
                         if media.type == "photo":
                             url = media.url
+                            media_type = "photo"
                         elif media.type == "video":
                             url = media.preview_image_url
+                            media_type = "video_preview"
                         else:
                             url = None
-                        if url:
+                            media_type = None
+                        if url and media_type:
                             try:
                                 img_data = requests.get(url, timeout=10).content
                                 ext = os.path.splitext(url)[1].split("?")[0] or ".jpg"
@@ -102,7 +105,10 @@ while total_fetched < max_total:
                                 img_path = os.path.join(IMAGES_DIR, img_filename)
                                 with open(img_path, "wb") as f:
                                     f.write(img_data)
-                                tweet_info["media"].append(img_path)
+                                tweet_info["media"].append({
+                                    "path": img_path,
+                                    "type": media_type
+                                })
                             except Exception as e:
                                 print(f"Failed to download image for tweet {tweet.id}: {e}")
             all_tweets.append(tweet_info)
