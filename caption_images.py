@@ -14,15 +14,18 @@ with open("bookmarked_tweets_v2.json", "r") as f:
     for tweet in tweets:
 
         if tweet["media"] != []:
-            img = Image.open(tweet["media"][0]["path"])
-            inputs = processor(img, return_tensors="pt")
-            out = model.generate(**inputs)
-            caption = processor.decode(out[0], skip_special_tokens=True)
-            print("successfully generated a caption")
+            imgs = [Image.open(thing['path']) for thing in tweet["media"]]
+            captions = []
+            for img in imgs:
+                inputs = processor(img, return_tensors="pt")
+                out = model.generate(**inputs)
+                caption = processor.decode(out[0], skip_special_tokens=True)
+                print("successfully generated a caption")
+                captions.append(caption)
         else:
-            caption = "N/A"
+            captions = ["N/A"]
 
-        tweet["caption"] = caption
+        tweet["captions"] = captions
         with open(captioned_tweets_file_name, "w") as f2:
             all_captioned_tweets.append(tweet)
             json.dump(all_captioned_tweets, f2, indent=2)
