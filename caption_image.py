@@ -1,8 +1,8 @@
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 
-processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base", use_fast=True)
-model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large", use_fast=True)
+model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
 
 
 with open("image_names.txt", "r") as f:
