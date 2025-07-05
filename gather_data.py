@@ -5,6 +5,9 @@ import json
 import requests
 import time
 import tweepy
+import re
+from bs4 import BeautifulSoup
+import bs4
 
 # --- Setup ---
 client_id = os.environ.get("TWITTER_CLIENT_ID")
@@ -42,7 +45,7 @@ pagination_token = None
 if os.path.exists("last_pagination_token.txt"):
     with open("last_pagination_token.txt", "r") as f:
         pagination_token = f.read().strip()
-output_file_name = "bookmarked_tweets_v2.json"
+output_file_name = "bookmarked_tweets_v3.json"
 with open(output_file_name, "r") as f:
     all_tweets = json.load(f)
 
@@ -112,11 +115,49 @@ while total_fetched < max_total:
                             except Exception as e:
                                 print(f"Failed to download image for tweet {tweet.id}: {e}")
             all_tweets.append(tweet_info)
-        total_fetched += len(response.data)
-        print(f"Fetched {total_fetched} tweets so far...")
-    else:
-        print("No more tweets found.")
-        break
+            # If the tweet has a card_uri and no media, try to fetch a preview image from oEmbed
+            if tweet_info["card_uri"] and not tweet_info["media"]:
+                try:
+                    # Extract the first URL from the tweet text
+                    tweet_text = tweet_info["text"] or ""
+                    if not isinstance(tweet_text, str):
+                        tweet_text = str(tweet_text)
+                    url_match = re.search(r'https?://\S+', tweet_text)
+                    if url_match:
+                        link_url = url_match.group(0)
+                        page_resp = requests.get(link_url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+                        if page_resp.status_code == 200:
+                            soup = BeautifulSoup(page_resp.text, "html.parser")
+                            og_image = soup.find('meta', property='og:image')
+                            # Ensure og_image is a Tag and has 'content'
+                            og_image_url = None
+                            if og_image and isinstance(og_image, bs4.element.Tag) and og_image.has_attr('content'):
+                                og_image_url = og_image['content']
+                            if og_image_url:
+                                # Ensure og_image_url is a string
+                                if not isinstance(og_image_url, str):
+                                    og_image_url = str(og_image_url)
+                                img_data = requests.get(og_image_url, timeout=10).content
+                                ext = os.path.splitext(og_image_url)[1].split("?")[0]
+                                if not ext:
+                                    ext = ".jpg"
+                                img_filename = f"tweet_{tweet.id}_card{ext}"
+                                img_path = os.path.join(IMAGES_DIR, img_filename)
+                                with open(img_path, "wb") as f:
+                                    f.write(img_data)
+                                if tweet_info["media"] is None:
+                                    tweet_info["media"] = []
+                                tweet_info["media"].append({
+                                    "path": img_path,
+                                    "type": "card_preview_og"
+                                })
+                except Exception as e:
+                    print(f"Failed to fetch OG card preview image for tweet {tweet.id}: {e}")
+            total_fetched += 1
+            print(f"Fetched {total_fetched} tweets so far...")
+        else:
+            print("No more tweets found.")
+            break
 
     print("Response meta:", response.meta)
     # Pagination
@@ -137,4 +178,4 @@ if pagination_token:
     with open("last_pagination_token.txt", "w") as f:
         f.write(pagination_token)
 
-print(f"Done! Saved {len(all_tweets)} tweets and their preview images (if any) to '{IMAGES_DIR}' and metadata to 'bookmarked_tweets.json'.")
+print(f"Done! Saved {len(all_tweets)} tweets and their preview images (if any) to '{IMAGES_DIR}' and metadata to '{output_file_name}'.")
