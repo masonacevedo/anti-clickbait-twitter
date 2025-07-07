@@ -171,7 +171,6 @@ def main():
     print("Fetching up to 1000 bookmarked tweets in batches of 100...")
     while total_fetched < max_total:
         print('continuing from tippy top...')
-        input('press enter to continue!')
         print("pagination token at beginning:", pagination_token)
         response = fetch_bookmarked_tweets(client, pagination_token, BATCH_SIZE)
         media_dict = {}
