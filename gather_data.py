@@ -111,13 +111,25 @@ def fetch_og_image(url, tweet_id, images_dir):
 def fetch_bookmarked_tweets(client, pagination_token, batch_size):
     return client.get_bookmarks(
         max_results=batch_size,
-        expansions=["attachments.media_keys"],
+        expansions=["attachments.media_keys", "referenced_tweets.id"],
         media_fields=["url", "type", "preview_image_url"],
         tweet_fields=["card_uri", "text"],
         pagination_token=pagination_token
     )
 
-def process_tweet(tweet, media_dict, seen_ids, images_dir):
+def process_tweet(tweet, media_dict, seen_ids, images_dir, referenced_tweets_dict=None):
+    print(type(tweet))
+    print(repr(tweet))
+    print(tweet)
+    print("dir(tweet):", dir(tweet))
+    if hasattr(tweet, "referenced_tweets"):
+        print("referenced_tweets:", tweet.referenced_tweets)
+    if hasattr(tweet, "attachements"):
+        print("attachments:", tweet.attachments)
+    if hasattr(tweet, "context_annotations"):
+        print("context_annotations:", tweet.context_annotations)
+    
+    # input()
     if tweet.id in seen_ids:
         print("about to skip")
         return None
@@ -137,6 +149,27 @@ def process_tweet(tweet, media_dict, seen_ids, images_dir):
                     if not isinstance(tweet_info["media"], list):
                         tweet_info["media"] = []
                     tweet_info["media"].append(media_info)
+    # Handle quoted tweet
+    if referenced_tweets_dict and hasattr(tweet, "referenced_tweets") and tweet.referenced_tweets:
+        for ref in tweet.referenced_tweets:
+            if getattr(ref, "type", None) == "quoted":
+                quoted_id = getattr(ref, "id", None)
+                if quoted_id and quoted_id in referenced_tweets_dict:
+                    quoted_tweet = referenced_tweets_dict[quoted_id]
+                    quoted_text = getattr(quoted_tweet, "text", None)
+                    quoted_media = []
+                    if hasattr(quoted_tweet, "attachments") and quoted_tweet.attachments and "media_keys" in quoted_tweet.attachments:
+                        for media_key in quoted_tweet.attachments["media_keys"]:
+                            media = media_dict.get(media_key)
+                            if media:
+                                media_info = download_media(media, quoted_tweet.id, media_key, images_dir)
+                                if media_info:
+                                    quoted_media.append(media_info)
+                    tweet_info["quoted_tweet"] = {
+                        "id": quoted_tweet.id,
+                        "text": quoted_text,
+                        "media": quoted_media
+                    }
     return tweet_info
 
 def try_add_og_image(tweet_info, images_dir):
@@ -170,17 +203,19 @@ def main():
 
     print("Fetching up to 1000 bookmarked tweets in batches of 100...")
     while total_fetched < max_total:
-        print('continuing from tippy top...')
-        print("pagination token at beginning:", pagination_token)
         response = fetch_bookmarked_tweets(client, pagination_token, BATCH_SIZE)
         media_dict = {}
         if hasattr(response, "includes") and response.includes and "media" in response.includes:
             for media in response.includes["media"]:
                 media_dict[media.media_key] = media
+        # Build referenced_tweets_dict for quoted tweets
+        referenced_tweets_dict = {}
+        if hasattr(response, "includes") and response.includes and "tweets" in response.includes:
+            for t in response.includes["tweets"]:
+                referenced_tweets_dict[t.id] = t
         if response.data:
             for tweet in response.data:
-                print("continuing from inside...")
-                tweet_info = process_tweet(tweet, media_dict, seen_ids, IMAGES_DIR)
+                tweet_info = process_tweet(tweet, media_dict, seen_ids, IMAGES_DIR, referenced_tweets_dict)
                 if tweet_info is None:
                     continue
                 try_add_og_image(tweet_info, IMAGES_DIR)
@@ -195,7 +230,6 @@ def main():
         if not pagination_token:
             print("no pagination token found")
             break
-        print("pagination token at end:", pagination_token)
         print("\n\n\n")
         time.sleep(3)
 
