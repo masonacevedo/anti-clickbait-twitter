@@ -1,7 +1,9 @@
 import os
+from pipes import quote
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 import tweepy
+import pickle
 
 def get_twitter_client():
     client_id = os.environ.get("TWITTER_CLIENT_ID")
@@ -35,20 +37,27 @@ def fetch_bookmarked_tweets(client, pagination_token=None, batch_size=100):
     )
 
 
-def save_quoted_data(quoted_tweet):
-    pass
+def get_quoted_data(quoted_tweet):
+    print(dir(quoted_tweet))
+    print(quoted_tweet.data)
+    print("items:", quoted_tweet.items())
+    print("keys:", quoted_tweet.keys())
+    print("values:", quoted_tweet.values())
+    input()
+    return None, None
+    # pass
 
 def save_tweet(t):
     base_text = t.text
-    quote_tweet = t.referenced_tweets
-    print("base_text:", base_text)
-    print("quote_tweet:", quote_tweet)
+    if t.referenced_tweets and len(t.referenced_tweets) > 1:
+        raise Exception(f"More than one tweet referenced: {t.referenced_tweets}")
 
-    if not(quote_tweet):
+    if t.referenced_tweets:
+        quoted_tweet = t.referenced_tweets[0]
+        quoted_text, quoted_images = get_quoted_data(quoted_tweet)
+    else:
         quoted_text = None
         quoted_images = []
-    else:
-        save_quoted_data(quote_tweet)
 
     
 
@@ -56,12 +65,14 @@ def save_tweet(t):
 def main():
     client = get_twitter_client()
     bookmarked_tweets = fetch_bookmarked_tweets(client)
+
+    with open("foo.pkl", "wb") as f:
+        pickle.dump(bookmarked_tweets.data, f)
+
     first_tweet = bookmarked_tweets.data[0]
+
     for tweet in bookmarked_tweets.data:
         save_tweet(tweet)
-        print(tweet)
-        print(dir(tweet))
-        input()
     
 
     
