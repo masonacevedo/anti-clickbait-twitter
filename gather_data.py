@@ -121,6 +121,21 @@ def main():
     
 
     
+def get_quoted_tweets():
+    with open(OUTPUT_FILE_NAME, "r") as f:
+        tweets_so_far = json.load(f)
+
+    quoted_tweet_ids = [tweet.get('quoted_tweet').get('id') for tweet in tweets_so_far if 'quoted_tweet' in tweet]
+
+    client = get_twitter_client()
+    quoted_tweets = client.get_tweets(ids=quoted_tweet_ids, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
+    print("sleeping for 10 seconds")
+    time.sleep(10)
+    print("quoted_tweets:\n", quoted_tweets)
+
+
+
 
 if __name__ == "__main__":
-    main()
+    get_quoted_tweets()
+    # main()
