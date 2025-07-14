@@ -76,10 +76,9 @@ def save_tweet(t, includes_var, client, tweets_so_far):
 
     if t.referenced_tweets:
         quoted_tweet = t.referenced_tweets[0]
-        quoted_text, quoted_images = get_quoted_data(quoted_tweet, client)
+        # quoted_text, quoted_images = get_quoted_data(quoted_tweet, client)
     else:
-        quoted_text = None
-        quoted_images = []
+        quoted_tweet = None
 
     
 
@@ -87,15 +86,14 @@ def save_tweet(t, includes_var, client, tweets_so_far):
         "id": t.id,
         "text": base_text,
         "images:": base_image_urls,
-        "quoted_tweet": {
-            "text": quoted_text, 
-            "media": quoted_images,
-        },
+        **({"quoted_tweet": {
+            "id": quoted_tweet.id
+        }} if quoted_tweet else {})
     }
 
     tweets_so_far.append(new_tweet)
     with open(OUTPUT_FILE_NAME, "w") as f:
-        json.dump(tweets_so_far,f, indent=2)
+        json.dump(tweets_so_far, f, indent=2)
 
 
 
