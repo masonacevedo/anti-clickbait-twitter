@@ -1,3 +1,4 @@
+import time
 import os
 from pipes import quote
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -39,15 +40,16 @@ def fetch_bookmarked_tweets(client, pagination_token=None, batch_size=100):
     )
 
 
-def get_quoted_data(quoted_tweet):
-    # print(dir(quoted_tweet))
-    # print(quoted_tweet.data)
-    # print("items:", quoted_tweet.items())
-    # print("keys:", quoted_tweet.keys())
-    # print("values:", quoted_tweet.values())
-    # input()
-    return None, None
-    # pass
+def get_quoted_data(quoted_tweet, client):
+    """This is currently broken, maybe?"""
+    quoted_tweet_id = quoted_tweet.get('id')
+    quoted_tweet = client.get_tweet(id=quoted_tweet_id, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
+    print("sleeping for 30 seconds")
+    time.sleep(30)
+    quoted_text = quoted_tweet.data.text
+    quoted_images = get_image_urls(quoted_tweet.data, quoted_tweet.includes)
+
+    return quoted_text, quoted_images
 
 def get_image_urls(t, includes_var):
     if t.attachments is None:
@@ -63,30 +65,32 @@ def get_image_urls(t, includes_var):
                 urls.append(item.url)
     return urls
 
-def save_tweet(t, includes_var):
+def save_tweet(t, includes_var, client, tweets_so_far):
     base_text = t.text
 
+    # get_image_urls should take in a tweet object and an includes var
     base_image_urls = get_image_urls(t, includes_var)
-    print("base_text:", base_text)
-    print("base_image_urls:", base_image_urls)
-    input()
-
+    
     if t.referenced_tweets and len(t.referenced_tweets) > 1:
         raise Exception(f"More than one tweet referenced: {t.referenced_tweets}")
 
     if t.referenced_tweets:
         quoted_tweet = t.referenced_tweets[0]
-        quoted_text, quoted_images = get_quoted_data(quoted_tweet)
+        quoted_text, quoted_images = get_quoted_data(quoted_tweet, client)
     else:
         quoted_text = None
         quoted_images = []
 
-    with open(OUTPUT_FILE_NAME, "r") as f:
-        tweets_so_far = json.load(f)
+    
 
     new_tweet = {
-        "base_text": base_text,
-        "quoted_text": quoted_text,
+        "id": t.id,
+        "text": base_text,
+        "images:": base_image_urls,
+        "quoted_tweet": {
+            "text": quoted_text, 
+            "media": quoted_images,
+        },
     }
 
     tweets_so_far.append(new_tweet)
@@ -101,9 +105,21 @@ def save_tweet(t, includes_var):
 def main():
     client = get_twitter_client()
     bookmarked_tweets = fetch_bookmarked_tweets(client)
+    print("Number of bookmarked tweets:", len(bookmarked_tweets.data))
+    print("sleeping for 10 seconds")
+    time.sleep(10)
 
-    for tweet in bookmarked_tweets.data:
-        save_tweet(tweet, bookmarked_tweets.includes)
+    with open(OUTPUT_FILE_NAME, "r") as f:
+        tweets_so_far = json.load(f)
+    
+    already_saved_ids = [tweet.get('id') for tweet in tweets_so_far]
+    # input()
+    
+
+    for index, tweet in enumerate(bookmarked_tweets.data):
+        print(index)
+        if not(tweet.id in already_saved_ids):
+            save_tweet(tweet, bookmarked_tweets.includes, client, tweets_so_far)
     
 
     
