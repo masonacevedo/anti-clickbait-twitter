@@ -160,6 +160,7 @@ def replace_ids_with_info():
 
 
 if __name__ == "__main__":
+    
+    main()
+    get_quoted_tweets()
     replace_ids_with_info()
-    # get_quoted_tweets()
-    # main()
