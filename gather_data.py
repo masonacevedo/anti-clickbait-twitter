@@ -7,6 +7,7 @@ import tweepy
 import json
 
 OUTPUT_FILE_NAME = "bookmarked_tweets_v5.json"
+OUTPUT_FILE_NAME_2 = "bookmarked_tweets_v6.json"
 
 def get_twitter_client():
     client_id = os.environ.get("TWITTER_CLIENT_ID")
@@ -131,11 +132,34 @@ def get_quoted_tweets():
     quoted_tweets = client.get_tweets(ids=quoted_tweet_ids, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
     print("sleeping for 10 seconds")
     time.sleep(10)
-    print("quoted_tweets:\n", quoted_tweets)
+    return quoted_tweets
 
+def replace_ids_with_info():
+    with open(OUTPUT_FILE_NAME, "r") as f:
+        all_tweets = json.load(f)
+    new_tweets = []
+    
+    quoted_tweets_response = get_quoted_tweets()
+    quoted_tweets = quoted_tweets_response.data
+    quoted_tweets_includes = quoted_tweets_response.includes
 
+    for tweet in all_tweets:
+        if "quoted_tweet" in tweet:
+            quoted_tweet = list(filter(lambda q: q.id == tweet.get('quoted_tweet').get('id'), quoted_tweets))[0]
+            image_urls = get_image_urls(quoted_tweet, quoted_tweets_includes)
+            # print("image_urls:", image_urls)
+            # input()
+            
+            tweet["quoted_tweet"] = {"text": quoted_tweet.text, "images": image_urls}
+            # print("tweet:", tweet)
+            # input()
+        new_tweets.append(tweet)
+
+    with open(OUTPUT_FILE_NAME_2, "w") as f:
+        json.dump(new_tweets, f, indent=2)
 
 
 if __name__ == "__main__":
-    get_quoted_tweets()
+    replace_ids_with_info()
+    # get_quoted_tweets()
     # main()
