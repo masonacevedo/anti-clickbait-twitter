@@ -7,7 +7,6 @@ import tweepy
 import json
 
 OUTPUT_FILE_NAME = "bookmarked_tweets_v5.json"
-OUTPUT_FILE_NAME_2 = "bookmarked_tweets_v6.json"
 
 def get_twitter_client():
     client_id = os.environ.get("TWITTER_CLIENT_ID")
@@ -126,7 +125,11 @@ def get_quoted_tweets():
     with open(OUTPUT_FILE_NAME, "r") as f:
         tweets_so_far = json.load(f)
 
-    quoted_tweet_ids = [tweet.get('quoted_tweet').get('id') for tweet in tweets_so_far if 'quoted_tweet' in tweet]
+    quoted_tweet_ids = []
+    for tweet in tweets_so_far:
+        if "quoted_tweet" in tweet:
+            if "id" in tweet.get('quoted_tweet'):
+                quoted_tweet_ids.append(tweet.get('quoted_tweet').get('id'))
 
     client = get_twitter_client()
     quoted_tweets = client.get_tweets(ids=quoted_tweet_ids, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
@@ -145,17 +148,15 @@ def replace_ids_with_info():
 
     for tweet in all_tweets:
         if "quoted_tweet" in tweet:
-            quoted_tweet = list(filter(lambda q: q.id == tweet.get('quoted_tweet').get('id'), quoted_tweets))[0]
-            image_urls = get_image_urls(quoted_tweet, quoted_tweets_includes)
-            # print("image_urls:", image_urls)
-            # input()
-            
-            tweet["quoted_tweet"] = {"text": quoted_tweet.text, "images": image_urls}
-            # print("tweet:", tweet)
-            # input()
+            if "id" in tweet.get('quoted_tweet'):
+                quoted_tweet = list(filter(lambda q: q.id == tweet.get('quoted_tweet').get('id'), quoted_tweets))[0]
+                image_urls = get_image_urls(quoted_tweet, quoted_tweets_includes)
+
+                tweet["quoted_tweet"] = {"text": quoted_tweet.text, "images": image_urls}
+
         new_tweets.append(tweet)
 
-    with open(OUTPUT_FILE_NAME_2, "w") as f:
+    with open(OUTPUT_FILE_NAME, "w") as f:
         json.dump(new_tweets, f, indent=2)
 
 
