@@ -102,7 +102,7 @@ def save_tweet(t, includes_var, client, tweets_so_far):
 
 def main(client):
     bookmarked_tweets = fetch_bookmarked_tweets(client)
-    print(f"Successfully fetched {len(bookmarked_tweets.data)} tweets, sleeping for 10 seconds")
+    print(f"Successfully fetched {len(bookmarked_tweets.data)} bookmarked tweets, sleeping for 10 seconds")
     time.sleep(10)
 
     with open(OUTPUT_FILE_NAME, "r") as f:
