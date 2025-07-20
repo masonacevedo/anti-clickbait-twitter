@@ -88,7 +88,8 @@ def save_tweet(t, includes_var, client, tweets_so_far):
         "images:": base_image_urls,
         **({"quoted_tweet": {
             "id": quoted_tweet.id
-        }} if quoted_tweet else {})
+        }} if quoted_tweet else {}),
+        "card_uri": getattr(t, "card_uri", None),
     }
 
     tweets_so_far.append(new_tweet)
