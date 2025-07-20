@@ -166,3 +166,6 @@ if __name__ == "__main__":
     client = get_twitter_client()
     main(client)
     replace_ids_with_info(client)
+    with open(OUTPUT_FILE_NAME, "r") as f:
+        all_tweets = json.load(f)
+    print(f"There are now {len(all_tweets)} saved in {OUTPUT_FILE_NAME}.")
