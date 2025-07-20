@@ -130,7 +130,7 @@ def get_quoted_tweets(client):
         quoted_tweets = []
     else:
         quoted_tweets = client.get_tweets(ids=quoted_tweet_ids, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
-        print(f"Successfully got {len(quoted_tweets)} quoted tweets. Sleeping for 10 seconds.")
+        print(f"Successfully got {len(quoted_tweets.data)} quoted tweets. Sleeping for 10 seconds.")
         time.sleep(10)
     return quoted_tweets
 
@@ -168,4 +168,4 @@ if __name__ == "__main__":
     replace_ids_with_info(client)
     with open(OUTPUT_FILE_NAME, "r") as f:
         all_tweets = json.load(f)
-    print(f"There are now {len(all_tweets)} saved in {OUTPUT_FILE_NAME}.")
+    print(f"There are now {len(all_tweets)} saved tweets in {OUTPUT_FILE_NAME}.")
