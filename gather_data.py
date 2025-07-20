@@ -100,8 +100,7 @@ def save_tweet(t, includes_var, client, tweets_so_far):
     
 
 
-def main():
-    client = get_twitter_client()
+def main(client):
     bookmarked_tweets = fetch_bookmarked_tweets(client)
     print("Number of bookmarked tweets:", len(bookmarked_tweets.data))
     print("sleeping for 10 seconds")
@@ -111,8 +110,6 @@ def main():
         tweets_so_far = json.load(f)
     
     already_saved_ids = [tweet.get('id') for tweet in tweets_so_far]
-    # input()
-    
 
     for index, tweet in enumerate(bookmarked_tweets.data):
         print(index)
@@ -121,7 +118,7 @@ def main():
     
 
     
-def get_quoted_tweets():
+def get_quoted_tweets(client):
     with open(OUTPUT_FILE_NAME, "r") as f:
         tweets_so_far = json.load(f)
 
@@ -131,20 +128,27 @@ def get_quoted_tweets():
             if "id" in tweet.get('quoted_tweet'):
                 quoted_tweet_ids.append(tweet.get('quoted_tweet').get('id'))
 
-    client = get_twitter_client()
-    quoted_tweets = client.get_tweets(ids=quoted_tweet_ids, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
+    if len(quoted_tweet_ids) == 0:
+        quoted_tweets = []
+    else:
+        quoted_tweets = client.get_tweets(ids=quoted_tweet_ids, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
     print("sleeping for 10 seconds")
     time.sleep(10)
     return quoted_tweets
 
-def replace_ids_with_info():
+def replace_ids_with_info(client):
     with open(OUTPUT_FILE_NAME, "r") as f:
         all_tweets = json.load(f)
     new_tweets = []
     
-    quoted_tweets_response = get_quoted_tweets()
-    quoted_tweets = quoted_tweets_response.data
-    quoted_tweets_includes = quoted_tweets_response.includes
+    quoted_tweets_response = get_quoted_tweets(client)
+
+    if quoted_tweets_response == []:
+        quoted_tweets = []
+        quoted_tweets_includes = {}
+    else:
+        quoted_tweets = quoted_tweets_response.data
+        quoted_tweets_includes = quoted_tweets_response.includes
 
     for tweet in all_tweets:
         if "quoted_tweet" in tweet:
@@ -161,7 +165,6 @@ def replace_ids_with_info():
 
 
 if __name__ == "__main__":
-    
-    main()
-    get_quoted_tweets()
-    replace_ids_with_info()
+    client = get_twitter_client()
+    main(client)
+    replace_ids_with_info(client)
