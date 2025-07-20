@@ -102,8 +102,7 @@ def save_tweet(t, includes_var, client, tweets_so_far):
 
 def main(client):
     bookmarked_tweets = fetch_bookmarked_tweets(client)
-    print("Number of bookmarked tweets:", len(bookmarked_tweets.data))
-    print("sleeping for 10 seconds")
+    print(f"Successfully fetched {len(bookmarked_tweets.data)} tweets, sleeping for 10 seconds")
     time.sleep(10)
 
     with open(OUTPUT_FILE_NAME, "r") as f:
@@ -112,7 +111,6 @@ def main(client):
     already_saved_ids = [tweet.get('id') for tweet in tweets_so_far]
 
     for index, tweet in enumerate(bookmarked_tweets.data):
-        print(index)
         if not(tweet.id in already_saved_ids):
             save_tweet(tweet, bookmarked_tweets.includes, client, tweets_so_far)
     
@@ -132,8 +130,8 @@ def get_quoted_tweets(client):
         quoted_tweets = []
     else:
         quoted_tweets = client.get_tweets(ids=quoted_tweet_ids, expansions=["attachments.media_keys"], media_fields=["url","type","preview_image_url"])
-    print("sleeping for 10 seconds")
-    time.sleep(10)
+        print(f"Successfully got {len(quoted_tweets)} quoted tweets. Sleeping for 10 seconds.")
+        time.sleep(10)
     return quoted_tweets
 
 def replace_ids_with_info(client):
