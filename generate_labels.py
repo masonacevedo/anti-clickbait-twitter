@@ -1,12 +1,13 @@
 import json
 import copy
 
-with open("bookmarked_tweets.json","r") as f:
+
+INPUT_FILE_NAME = "bookmarked_tweets_v5.json"
+with open(INPUT_FILE_NAME,"r") as f:
     d = json.load(f)
 
-output_file_name = "labeled_tweets.json"
-
-with open(output_file_name,"r") as f:
+OUTPUT_FILE_NAME = "labeled_tweets.json"
+with open(OUTPUT_FILE_NAME,"r") as f:
     labeled_tweets = json.load(f)
 
 existing_ids = [tweet.get('id') for tweet in labeled_tweets]
