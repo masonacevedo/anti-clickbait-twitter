@@ -26,7 +26,7 @@ for index, tweet in enumerate(d):
     labeled_tweet = copy.deepcopy(tweet)
     labeled_tweet["score"] = clickbait_score
     labeled_tweets.append(labeled_tweet)
-    with open("labeled_tweets.json", "w") as f:
+    with open(OUTPUT_FILE_NAME, "w") as f:
         json.dump(labeled_tweets, f, indent=2)
 
 
