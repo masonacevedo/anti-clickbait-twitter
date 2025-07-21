@@ -2,13 +2,15 @@ import json
 
 import torch
 from torch.utils.data import Dataset
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, TrainingArguments, Trainer
+
+from sklearn.model_selection import train_test_split
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 model_name = "distilbert-base-uncased"
 tokenizer = DistilBertTokenizer.from_pretrained(model_name)
-model = DistilBertForSequenceClassification.from_pretrained(model_name)
+model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
 text = "claude would definitely hang out in the English teachers classroom during lunch"
 
@@ -50,4 +52,32 @@ class TweetDataset(Dataset):
 
 
 dataset = TweetDataset('labeled_tweets.json', tokenizer)
-print(dataset[0])
+
+training_dataset = TweetDataset("train.json", tokenizer)
+validation_dataset = TweetDataset("val.json", tokenizer)
+
+training_args = TrainingArguments(
+    output_dir = "./results",
+    num_train_epochs=3,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    eval_strategy="epoch",
+    save_strategy="epoch",
+    logging_dir="./logs",
+    logging_steps=10,
+    load_best_model_at_end=True,
+    metric_for_best_model="eval_loss",
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=training_dataset,
+    eval_dataset=validation_dataset
+)
+
+printf("Trainer device:", trainer.args.device)
+
+trainer.train()
+
+trainer.save_model("bad_tweets_model_1")
