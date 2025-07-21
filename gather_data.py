@@ -85,7 +85,7 @@ def save_tweet(t, includes_var, client, tweets_so_far):
     new_tweet = {
         "id": t.id,
         "text": base_text,
-        "images:": base_image_urls,
+        "images": base_image_urls,
         **({"quoted_tweet": {
             "id": quoted_tweet.id
         }} if quoted_tweet else {}),
