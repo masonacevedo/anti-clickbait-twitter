@@ -17,7 +17,13 @@ existing_ids = [tweet.get('id') for tweet in labeled_tweets]
 for index, tweet in enumerate(d):
     print("\n\n\n")
     print(f"Labeling tweet {index+1} of {len(d)}.")
-    print(tweet)
+    print(f"text: {tweet.get('text')}")
+    print(f'images: {tweet.get('images')}')
+    print(f'card_uri: {tweet.get('card_uri')}')
+    if 'quoted_tweet' in tweet:
+        print(f"quoted_text: {tweet.get('quoted_tweet').get('text')}")
+        print(f"quoted_images: {tweet.get('quoted_tweet').get('images')}")
+
     if tweet.get('id') in existing_ids:
         continue
     clickbait_score = input("Please input a 0, 1, or 2, or 3(0=not clickbait, 1=sorta clickbait, 2=definitely clickbait, 3=not sure):")
