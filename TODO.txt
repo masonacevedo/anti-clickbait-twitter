@@ -1,0 +1,3 @@
+add the account handle to the information we're looking at,
+add the length of the video, if there is one, to the information we're looking at
+add the account profile pic too, maybe?
