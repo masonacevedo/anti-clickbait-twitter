@@ -42,9 +42,11 @@ const observer = new MutationObserver(async (mutations) => {
     let articles = [];
     for (const mutation of mutations) {
         mutation.addedNodes.forEach(node => {
-            node.querySelectorAll("article").forEach((article) => {
-                articles.push(article);
-            })
+            if (node.querySelectorAll){
+                node.querySelectorAll("article").forEach((article) => {
+                    articles.push(article);
+                })
+            }
         })
     }
     if (articles.length > 0 && transparentMode){
