@@ -15,27 +15,44 @@ async function evaluateText(text) {
     return result;
 }
 
-function processTweet(article) {
+async function processTweet(article) {
     console.log("analyzing article");
 
     const tweetTextElement = article.querySelector('[data-testid="tweetText"]');
     let extractedText = tweetTextElement.textContent.trim();
-    evaluateText(extractedText).then(res => {
-        console.log("extractedText:", extractedText);
-        console.log("result:", res);
-    })
+    const res = await evaluateText(extractedText);
+    return res;
 }
 
-const observer = new MutationObserver((mutations) => {
+const observer = new MutationObserver(async (mutations) => {
     console.log("New batch of mutations detected")
+
+    let articles = [];
     for (const mutation of mutations) {
         mutation.addedNodes.forEach(node => {
             node.querySelectorAll("article").forEach((article) => {
-                processTweet(article)
+                articles.push(article);
             })
         })
     }
-    console.log();
+    
+    const promises = articles.map(async (article) => {
+        const score = await processTweet(article);
+        return score;
+    });
+    const scores = await Promise.all(promises);
+    if (articles.length > 0) {
+        for (let i = 0; i < articles.length; i++) {
+
+            // console.log("articles[i]:", articles[i].textContent);
+            // tweetTextElement = articles[i].querySelector('[data-testid="tweetText"]');
+            // console.log(tweetTextElement.innerText.trim());
+            // console.log(scores[i]['score']);
+            articles[i].style.opacity = (1 - scores[i]['score']);
+        }
+        // console.log("articles:", articles);
+        // console.log('scores:', scores);
+    }
 });
 
 observer.observe(document.body, {childList: true, subtree: true});
