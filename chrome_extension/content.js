@@ -15,3 +15,14 @@ async function evaluateText(text) {
     return result;
 }
 
+
+const observer = new MutationObserver((mutations) => {
+    console.log("New batch of mutations detected")
+    for (const mutation of mutations) {
+        console.log("Mutation:")
+        console.log(mutation)
+    }
+    console.log();
+});
+
+observer.observe(document.body, {childList: true, subtree: true});
