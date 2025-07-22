@@ -56,7 +56,7 @@ observer.observe(document.body, {childList: true, subtree: true});
 
 let transparentMode = true;
 const button = document.createElement('button');
-button.textContent = 'Reset Tweets';
+button.textContent = 'Change to normal mode.';
 button.style.fontSize = '14px';
 button.style.padding = '8px 12px';
 button.style.backgroundColor = '#dc3545';
@@ -74,17 +74,18 @@ button.style.padding = '6px 10px';
 button.addEventListener('click', async () => {
     transparentMode = !transparentMode;
     if (transparentMode){
+        button.textContent = 'Change to normal mode.';
         let articles = Array.from(document.querySelectorAll('article'));
         await makeTweetsTransparent(articles);
     }
     else{
+        button.textContent = 'Change to transparent mode.';
         document.querySelectorAll('article').forEach(article => {
             if (article.style.opacity){
                 article.style.opacity = 1;
             }
         })
     }
-    
 });
 
 
