@@ -1,2 +1,13 @@
 my_env/
 .vscode/
+results/
+train.json
+val.json
+
+bookmarked_tweets_v5.json
+labeled_tweets.json
+original_labeled_tweets.json
+
+bad_tweets_model_1/
+
+python_files/pyrightconfig.json
