@@ -15,12 +15,23 @@ async function evaluateText(text) {
     return result;
 }
 
+function processTweet(article) {
+    console.log("analyzing article");
+
+    const tweetTextElement = article.querySelector('[data-testid="tweetText"]');
+    console.log('tweetTextElement:', tweetTextElement)
+    console.log("tweetTextElement.textContent:", tweetTextElement.textContent);
+    console.log("tweetTextElement.textContent.trim():", tweetTextElement.textContent.trim());
+}
 
 const observer = new MutationObserver((mutations) => {
     console.log("New batch of mutations detected")
     for (const mutation of mutations) {
-        console.log("Mutation:")
-        console.log(mutation)
+        mutation.addedNodes.forEach(node => {
+            node.querySelectorAll("article").forEach((article) => {
+                processTweet(article)
+            })
+        })
     }
     console.log();
 });
