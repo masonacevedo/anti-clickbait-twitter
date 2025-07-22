@@ -15,7 +15,3 @@ async function evaluateText(text) {
     return result;
 }
 
-
-let res = evaluateText("NEED https://t.co/9TKg3mzpsK").then(res => {
-   console.log('Result:', res)
-});
