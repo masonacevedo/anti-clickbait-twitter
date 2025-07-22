@@ -34,4 +34,5 @@ for t in val_tweets:
     print(f"Prediction:", prediction)
     print(f"Logits: {logits}")
     print(f"Probabilities: {probabilities}")
+    print(f"List(probs):{probabilities[0].tolist()}")
     input()
