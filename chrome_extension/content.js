@@ -23,6 +23,7 @@ async function processTweet(article) {
 }
 
 async function makeTweetsTransparent(articles) {
+    console.log("articles:", articles);
     const promises = articles.map(async (article) => {
         const score = await processTweet(article);
         return score;
@@ -78,7 +79,9 @@ document.body.appendChild(button);
 button.addEventListener('click', () => {
     transparentMode = !transparentMode;
     if (transparentMode){
-        makeTweetsTransparent();
+        let articles = Array.from(document.querySelectorAll('article'));
+        console.log("about to pass in manually gathered articles");
+        makeTweetsTransparent(articles);
     }
     else{
         document.querySelectorAll('article').forEach(article => {
