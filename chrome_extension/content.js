@@ -22,16 +22,7 @@ async function processTweet(article) {
     return res;
 }
 
-async function makeTweetsTransparent(mutations) {
-    let articles = [];
-    for (const mutation of mutations) {
-        mutation.addedNodes.forEach(node => {
-            node.querySelectorAll("article").forEach((article) => {
-                articles.push(article);
-            })
-        })
-    }
-    
+async function makeTweetsTransparent(articles) {
     const promises = articles.map(async (article) => {
         const score = await processTweet(article);
         return score;
@@ -44,10 +35,21 @@ async function makeTweetsTransparent(mutations) {
     }
 }
 
-const observer = new MutationObserver(makeTweetsTransparent);
+const observer = new MutationObserver(async (mutations) => {
+    let articles = [];
+    for (const mutation of mutations) {
+        mutation.addedNodes.forEach(node => {
+            node.querySelectorAll("article").forEach((article) => {
+                articles.push(article);
+            })
+        })
+    }
+    await makeTweetsTransparent(articles);
+});
 
 observer.observe(document.body, {childList: true, subtree: true});
 
+let transparentMode = true;
 const button = document.createElement('button');
 button.textContent = 'Reset Tweets';
 button.style.fontSize = '14px';
@@ -74,11 +76,18 @@ document.body.appendChild(button);
 
 // Add click functionality
 button.addEventListener('click', () => {
-    document.querySelectorAll('article').forEach(article => {
-        if (article.style.opacity){
-            article.style.opacity = 1;
-        }
-    })
+    transparentMode = !transparentMode;
+    if (transparentMode){
+        makeTweetsTransparent();
+    }
+    else{
+        document.querySelectorAll('article').forEach(article => {
+            if (article.style.opacity){
+                article.style.opacity = 1;
+            }
+        })
+    }
+    
 });
 
 // Add to page
