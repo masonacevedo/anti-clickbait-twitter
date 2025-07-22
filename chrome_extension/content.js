@@ -66,18 +66,9 @@ button.style.borderRadius = '6px';
 button.style.cursor = 'pointer';
 button.style.fontWeight = 'bold';
 
-// Position it in the gap between sidebar and feed
-button.style.position = 'fixed';
-button.style.zIndex = '999999';
-button.style.left = '280px';        // Just past the sidebar width
-button.style.top = '100px';         // Below the top nav
-button.style.transform = 'translateX(-50%)'; // Center it in the gap
-
 // Optional: make it smaller to fit the narrow space
 button.style.fontSize = '12px';
 button.style.padding = '6px 10px';
-
-document.body.appendChild(button);
 
 // Add click functionality
 button.addEventListener('click', async () => {
@@ -96,22 +87,17 @@ button.addEventListener('click', async () => {
     
 });
 
-// Add to page
-document.body.appendChild(button);
 
+// hacky, but the console will get into an infinite loop
+// if we don't have something like this. 
 let navButtonCount = 0;
 const navObserver = new MutationObserver( (mutations, obs) => {
     for (const mutation of mutations) {
         mutation.addedNodes.forEach(node => {
             nav = document.querySelector('nav[role="navigation"]');
             if (nav && navButtonCount < 1) {
-                console.log("nav found!", nav);
-                let newButton = document.createElement('button');
-                newButton.textContent = 'howdy!';
-                newButton.style.backgroundColor = '#dc3545';
-                newButton.style.color = 'white';
+                console.log('adding toggle button');
                 nav.appendChild(button);
-                nav.appendChild(newButton);
                 navButtonCount += 1;
             }
         })
