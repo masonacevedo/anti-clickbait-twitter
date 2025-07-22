@@ -24,6 +24,9 @@ async function processTweet(article) {
 
 async function makeTweetsTransparent(articles) {
     console.log("articles:", articles);
+    if (articles.length === 0){
+        return
+    }
     const promises = articles.map(async (article) => {
         const score = await processTweet(article);
         return score;
@@ -45,7 +48,9 @@ const observer = new MutationObserver(async (mutations) => {
             })
         })
     }
-    await makeTweetsTransparent(articles);
+    if (articles.length > 0 && transparentMode){
+        await makeTweetsTransparent(articles);
+    }
 });
 
 observer.observe(document.body, {childList: true, subtree: true});
@@ -76,12 +81,12 @@ button.style.padding = '6px 10px';
 document.body.appendChild(button);
 
 // Add click functionality
-button.addEventListener('click', () => {
+button.addEventListener('click', async () => {
     transparentMode = !transparentMode;
     if (transparentMode){
         let articles = Array.from(document.querySelectorAll('article'));
         console.log("about to pass in manually gathered articles");
-        makeTweetsTransparent(articles);
+        await makeTweetsTransparent(articles);
     }
     else{
         document.querySelectorAll('article').forEach(article => {
