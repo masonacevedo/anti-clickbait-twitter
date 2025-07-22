@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import torch
 import torch.nn.functional as F
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
@@ -14,6 +15,7 @@ model = model.to(device)
 model.eval()
 
 app = Flask(__name__)
+CORS(app)
 
 def make_predction(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
