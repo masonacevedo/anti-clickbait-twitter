@@ -19,9 +19,11 @@ function processTweet(article) {
     console.log("analyzing article");
 
     const tweetTextElement = article.querySelector('[data-testid="tweetText"]');
-    console.log('tweetTextElement:', tweetTextElement)
-    console.log("tweetTextElement.textContent:", tweetTextElement.textContent);
-    console.log("tweetTextElement.textContent.trim():", tweetTextElement.textContent.trim());
+    let extractedText = tweetTextElement.textContent.trim();
+    evaluateText(extractedText).then(res => {
+        console.log("extractedText:", extractedText);
+        console.log("result:", res);
+    })
 }
 
 const observer = new MutationObserver((mutations) => {
