@@ -23,7 +23,6 @@ async function processTweet(article) {
 }
 
 async function makeTweetsTransparent(articles) {
-    console.log("articles:", articles);
     if (articles.length === 0){
         return
     }
@@ -85,7 +84,6 @@ button.addEventListener('click', async () => {
     transparentMode = !transparentMode;
     if (transparentMode){
         let articles = Array.from(document.querySelectorAll('article'));
-        console.log("about to pass in manually gathered articles");
         await makeTweetsTransparent(articles);
     }
     else{
