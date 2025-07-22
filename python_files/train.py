@@ -51,10 +51,10 @@ class TweetDataset(Dataset):
         return encoding
 
 
-dataset = TweetDataset('labeled_tweets.json', tokenizer)
+dataset = TweetDataset('../labeled_tweets.json', tokenizer)
 
-training_dataset = TweetDataset("train.json", tokenizer)
-validation_dataset = TweetDataset("val.json", tokenizer)
+training_dataset = TweetDataset("../train.json", tokenizer)
+validation_dataset = TweetDataset("../val.json", tokenizer)
 
 training_args = TrainingArguments(
     output_dir = "./results",
@@ -76,7 +76,7 @@ trainer = Trainer(
     eval_dataset=validation_dataset
 )
 
-printf("Trainer device:", trainer.args.device)
+print("Trainer device:", trainer.args.device)
 
 trainer.train()
 
