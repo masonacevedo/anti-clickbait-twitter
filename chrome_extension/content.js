@@ -22,7 +22,7 @@ async function processTweet(article) {
     return res;
 }
 
-const observer = new MutationObserver(async (mutations) => {
+async function makeTweetsTransparent(mutations) {
     let articles = [];
     for (const mutation of mutations) {
         mutation.addedNodes.forEach(node => {
@@ -42,7 +42,9 @@ const observer = new MutationObserver(async (mutations) => {
             articles[i].style.opacity = (1 - scores[i]['score']);
         }
     }
-});
+}
+
+const observer = new MutationObserver(makeTweetsTransparent);
 
 observer.observe(document.body, {childList: true, subtree: true});
 
