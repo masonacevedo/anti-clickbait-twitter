@@ -90,15 +90,14 @@ button.addEventListener('click', async () => {
 
 // hacky, but the console will get into an infinite loop
 // if we don't have something like this. 
-let navButtonCount = 0;
+let navButtonAdded = false;
 const navObserver = new MutationObserver( (mutations, obs) => {
     for (const mutation of mutations) {
         mutation.addedNodes.forEach(node => {
             nav = document.querySelector('nav[role="navigation"]');
-            if (nav && navButtonCount < 1) {
-                console.log('adding toggle button');
+            if (nav && (!navButtonAdded)) {
                 nav.appendChild(button);
-                navButtonCount += 1;
+                navButtonAdded = true;
             }
         })
     }
