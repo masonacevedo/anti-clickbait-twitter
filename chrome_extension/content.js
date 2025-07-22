@@ -17,9 +17,11 @@ async function evaluateText(text) {
 
 async function processTweet(article) {
     const tweetTextElement = article.querySelector('[data-testid="tweetText"]');
-    let extractedText = tweetTextElement.textContent.trim();
-    const res = await evaluateText(extractedText);
-    return res;
+    if (tweetTextElement){
+        let extractedText = tweetTextElement.textContent.trim();
+        const res = await evaluateText(extractedText);
+        return res;
+    }
 }
 
 async function makeTweetsTransparent(articles) {
