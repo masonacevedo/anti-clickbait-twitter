@@ -15,4 +15,7 @@ async function evaluateText(text) {
     return result;
 }
 
-evaluateText("i am so incredibly insanely silly");
+
+let res = evaluateText("NEED https://t.co/9TKg3mzpsK").then(res => {
+   console.log('Result:', res)
+});
