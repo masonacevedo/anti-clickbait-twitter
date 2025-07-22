@@ -98,3 +98,23 @@ button.addEventListener('click', async () => {
 
 // Add to page
 document.body.appendChild(button);
+
+let navButtonCount = 0;
+const navObserver = new MutationObserver( (mutations, obs) => {
+    for (const mutation of mutations) {
+        mutation.addedNodes.forEach(node => {
+            nav = document.querySelector('nav[role="navigation"]');
+            if (nav && navButtonCount < 1) {
+                console.log("nav found!", nav);
+                let newButton = document.createElement('button');
+                newButton.textContent = 'howdy!';
+                newButton.style.backgroundColor = '#dc3545';
+                newButton.style.color = 'white';
+                nav.appendChild(button);
+                nav.appendChild(newButton);
+                navButtonCount += 1;
+            }
+        })
+    }
+});
+navObserver.observe(document.body, {childList: true, subtree: true})
