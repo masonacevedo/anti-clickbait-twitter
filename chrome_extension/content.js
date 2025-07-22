@@ -21,6 +21,8 @@ async function processTweet(article) {
         let extractedText = tweetTextElement.textContent.trim();
         const res = await evaluateText(extractedText);
         return res;
+    } else {
+        return 0;
     }
 }
 
