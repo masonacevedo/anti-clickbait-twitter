@@ -12,20 +12,6 @@ model_name = "distilbert-base-uncased"
 tokenizer = DistilBertTokenizer.from_pretrained(model_name)
 model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
-text = "claude would definitely hang out in the English teachers classroom during lunch"
-
-inputs = tokenizer(text, return_tensors="pt")
-
-with torch.no_grad():
-    outputs = model(**inputs)
-    logits = outputs.logits
-
-prediction = torch.argmax(logits, dim=1).item()
-
-print("Text:", text)
-print("logits:", logits)
-print("prediction:", prediction)
-
 class TweetDataset(Dataset):
     def __init__(self, json_path, tokenizer, max_length=128):
         with open(json_path, "r") as f:
