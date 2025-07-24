@@ -1,3 +1,4 @@
+console.log("Anti-Clickbait Twitter Extension loaded!");
 async function evaluateText(text) {
     let data = {"text": text};
     const response = await fetch('http://127.0.0.1:5000/evaluate', {
