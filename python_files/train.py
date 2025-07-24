@@ -36,9 +36,6 @@ class TweetDataset(Dataset):
         encoding['labels'] = torch.tensor(label)
         return encoding
 
-
-dataset = TweetDataset('../labeled_tweets.json', tokenizer)
-
 training_dataset = TweetDataset("../train.json", tokenizer)
 validation_dataset = TweetDataset("../val.json", tokenizer)
 
