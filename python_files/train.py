@@ -8,23 +8,18 @@ from sklearn.model_selection import train_test_split
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
+
+class DistilBertForBoundedRegression(DistilBertForSequenceClassification):
+    def forward(self, *args, **kwargs):
+        output = super().forward(*args, **kwargs)
+        output.logits = torch.sigmoid(output.logits)
+        return output
+
+
 model_name = "distilbert-base-uncased"
 tokenizer = DistilBertTokenizer.from_pretrained(model_name)
-model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=3)
+model = DistilBertForBoundedRegression.from_pretrained(model_name, num_labels=1)
 
-text = "claude would definitely hang out in the English teachers classroom during lunch"
-
-inputs = tokenizer(text, return_tensors="pt")
-
-with torch.no_grad():
-    outputs = model(**inputs)
-    logits = outputs.logits
-
-prediction = torch.argmax(logits, dim=1).item()
-
-print("Text:", text)
-print("logits:", logits)
-print("prediction:", prediction)
 
 class TweetDataset(Dataset):
     def __init__(self, json_path, tokenizer, max_length=128):
@@ -46,7 +41,8 @@ class TweetDataset(Dataset):
             return_tensors="pt"
         )
         encoding = {k: v.squeeze(0) for k, v in encoding.items()}
-        label = int(item.get('score'))
+        label_map = {"0": float(0.0), "1": float(0.5), "2": float(1.0)}
+        label = float(label_map[item.get('score')])
         encoding['labels'] = torch.tensor(label)
         return encoding
 
@@ -80,4 +76,4 @@ print("Trainer device:", trainer.args.device)
 
 trainer.train()
 
-trainer.save_model("bad_tweets_model_1")
+trainer.save_model("bad_tweets_model_2")

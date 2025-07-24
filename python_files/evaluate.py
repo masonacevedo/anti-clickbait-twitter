@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 
 
-model_path = "bad_tweets_model_1"
+model_path = "bad_tweets_model_2"
 
 tokenizer = DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
 model = DistilBertForSequenceClassification.from_pretrained(model_path)
@@ -15,7 +15,7 @@ model = model.to(device)
 
 model.eval()
 
-with open("val.json", "r") as f:
+with open("../val.json", "r") as f:
     val_tweets = json.load(f)
 
 for t in val_tweets:
