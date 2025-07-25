@@ -15,7 +15,7 @@ model = model.to(device)
 
 model.eval()
 
-with open("val.json", "r") as f:
+with open("../val.json", "r") as f:
     val_tweets = json.load(f)
 
 for t in val_tweets:
