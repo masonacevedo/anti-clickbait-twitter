@@ -11,3 +11,5 @@ original_labeled_tweets.json
 bad_tweets_model_1/
 
 python_files/pyrightconfig.json
+
+*.DS_Store*
