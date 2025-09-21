@@ -1,10 +1,11 @@
-import torch
+from transformers import CLIPModel, CLIPProcessor
 
+import torch
 import torch.nn as nn
 
 class CustomCLIPModel(nn.Module):
     def __init__(self, clip_model,num_labels=3):
-        super.__init__()
+        super().__init__()
         self.clip_model = clip_model
         self.num_labels = num_labels
 
@@ -30,3 +31,8 @@ class CustomCLIPModel(nn.Module):
         combined_embeddings = torch.cat([text_embeddings, image_embeddings], dim=1)
 
         return self.custom_layers(combined_embeddings)
+
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+myModel = CustomCLIPModel(clip_model)
+
+print(myModel)
