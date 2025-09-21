@@ -13,7 +13,6 @@ class CustomCLIPModel(nn.Module):
             nn.Linear(2*clip_embedding_size, 64),
             nn.ReLU(),
             nn.Linear(64, self.num_labels),
-            nn.Softmax(dim=1)
         )
 
 
