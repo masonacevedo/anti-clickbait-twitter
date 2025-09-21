@@ -33,6 +33,18 @@ class CustomCLIPModel(nn.Module):
         return self.custom_layers(combined_embeddings)
 
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+
+for param in clip_model.parameters():
+    param.requires_grad = False
+
 myModel = CustomCLIPModel(clip_model)
 
 print(myModel)
+
+
+trainable_params = sum(p.numel() for p in myModel.parameters() if p.requires_grad)
+total_params = sum(p.numel() for p in myModel.parameters())
+
+print(f"Trainable parameters: {trainable_params:,}")
+print(f"Total parameters: {total_params:,}")
+print(f"Percentage trainable: {100 * trainable_params / total_params:.2f}%")
