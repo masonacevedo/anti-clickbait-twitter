@@ -10,11 +10,8 @@ class CustomCLIPModel(nn.Module):
         self.num_labels = num_labels
 
         clip_embedding_size = 512
-        self.custom_layers = nn.Sequential(
-            nn.Linear(2*clip_embedding_size, 64),
-            nn.ReLU(),
-            nn.Linear(64, self.num_labels),
-        )
+        self.custom_layers = nn.Linear(2*clip_embedding_size, self.num_labels)
+
 
 
     def forward(self, tokens, attention_mask, images):
