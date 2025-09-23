@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset
 import json
 from PIL import Image
+from transformers import CLIPProcessor
 
 class TweetDataset(Dataset):
     def __init__(self, json_path, processor, max_length=128):
@@ -21,15 +22,25 @@ class TweetDataset(Dataset):
             image_url = item.get('images')[0]
             image_name = image_url.split("/")[-1]
             image_location = "../images/" + image_name
-            image = Image.open(image_location)
+            try:
+                image = Image.open(image_location)
+            except FileNotFoundError:
+                print(f"Image {image_location} not found")
+                image = None
         else:
             image = None
 
         encoding = self.processor(
             text=text,
-            image=image,
+            images=image,
             return_tensors="pt",
             padding="max_length",
             truncation=True
         )
         return encoding
+
+if __name__ == "__main__":
+    CLIPProcessor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    dataset = TweetDataset("../bookmarked_tweets_v5.json", CLIPProcessor)
+    for item in dataset:
+        print(item)
