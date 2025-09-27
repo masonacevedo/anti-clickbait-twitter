@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset
 import json
 from PIL import Image
-from transformers import CLIPProcessor
+from transformers import CLIPModel, CLIPProcessor
 import torch
 
 class TweetDataset(Dataset):
@@ -47,7 +47,11 @@ class TweetDataset(Dataset):
 
 if __name__ == "__main__":
     CLIPProcessor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     dataset = TweetDataset("../bookmarked_tweets_v5.json", CLIPProcessor)
     for item in dataset:
         print("item:", item)
+        # Extract only the fields that CLIP model expects
+        clip_inputs = {k: v for k, v in item.items() if k in ['input_ids', 'attention_mask', 'pixel_values']}
+        print("model(**clip_inputs):", model(**clip_inputs))
         input("Press Enter to continue...")
