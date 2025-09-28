@@ -40,17 +40,8 @@ training_data, validation_data = random_split(all_data, [0.8, 0.2])
 training_dataset = DataLoader(training_data, batch_size=16, shuffle=True)
 validation_dataset = DataLoader(validation_data, batch_size=16, shuffle=True)
 
-# for item in enumerate(training_dataset):
-#     print("item[0]:", item[0])
-#     print("item[1]:", item[1])
-#     print("type(item[1]):", type(item[1]))
-#     print("item[1].keys():", item[1].keys())
-#     print("model(**item[1]):", myModel(item[1]))
-#     input("Press Enter to continue...")
-
 last_time = time.time()
 EPOCHS = 5
-myModel.train()
 for epoch in range(0, EPOCHS):
     if (time.time() - last_time) > 30:
         last_time = time.time()
@@ -58,14 +49,7 @@ for epoch in range(0, EPOCHS):
         print(f"Epoch {epoch} | Loss: {loss.item()}")
 
     for index, data in enumerate(training_dataset):
-        # if index
-        # input_tokens = data.get('input_ids')
-        # attention_masks = data.get('attention_mask')
-        # pixel_values = data.get('pixel_values')
-        # has_images = data.get('has_image')
-        # labels = data.get('label')
-        # print("pixel_values.shape:", pixel_values.shape)
-        # input("Press Enter to continue...")
+        myModel.train()
 
         data['pixel_values'] = data['pixel_values'].squeeze(1).to(device)
         data['input_ids'] = data['input_ids'].to(device)
@@ -83,3 +67,28 @@ for epoch in range(0, EPOCHS):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+    myModel.eval()
+    with torch.no_grad():
+        num_correct = 0
+        num_seen = 0
+        for batch, data in enumerate(validation_dataset):
+            data['pixel_values'] = data['pixel_values'].squeeze(1).to(device)
+            data['input_ids'] = data['input_ids'].to(device)
+            data['attention_mask'] = data['attention_mask'].squeeze(1).to(device)
+            data['label'] = data['label'].to(device)
+
+            # input("Press Enter to continue...")
+            labels = data['label']
+            inputs = {k: v for k, v in data.items() if k in ['input_ids', 'attention_mask', 'pixel_values']}
+
+            logits = myModel(**inputs)
+            predictions = torch.argmax(logits, dim=1)
+            print("predictions:", predictions)
+            print("labels:", labels)
+
+            num_correct += (predictions == labels).sum().item()
+            num_seen += labels.size(0)
+
+        accuracy = float(num_correct) / float(num_seen)
+        print(f"Epoch {epoch} | Accuracy: {accuracy}")
