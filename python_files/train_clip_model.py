@@ -63,13 +63,16 @@ for epoch in range(0, EPOCHS):
         data['pixel_values'] = data['pixel_values'].squeeze(1).to(device)
         data['input_ids'] = data['input_ids'].to(device)
         data['attention_mask'] = data['attention_mask'].squeeze(1).to(device)
+        data['label'] = data['label'].to(device)
 
         # input("Press Enter to continue...")
         labels = data['label']
         inputs = {k: v for k, v in data.items() if k in ['input_ids', 'attention_mask', 'pixel_values']}
 
-        outputs = myModel(**inputs)
-        loss = loss_function(outputs, labels)
+        logits = myModel(**inputs)
+        predictions = torch.argmax(logits, dim=1)
+
+        loss = loss_function(logits, labels)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
