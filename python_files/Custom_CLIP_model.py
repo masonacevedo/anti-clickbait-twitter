@@ -14,12 +14,12 @@ class CustomCLIPModel(nn.Module):
 
 
 
-    def forward(self, tokens, attention_mask, images):
+    def forward(self, input_ids, attention_mask, pixel_values):
 
         clip_outputs = self.clip_model(
-            input_ids=tokens,
+            input_ids=input_ids,
             attention_mask=attention_mask,
-            pixel_values=images,
+            pixel_values=pixel_values,
         )
 
         text_embeddings = clip_outputs.text_embeds
