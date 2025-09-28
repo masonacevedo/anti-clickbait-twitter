@@ -9,7 +9,7 @@ from torch.utils.data import random_split, DataLoader
 from tweet_dataset import TweetDataset
 
 
-
+model_path = input("Enter a name for the model:")
 torch.manual_seed(42)
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
@@ -84,3 +84,4 @@ for epoch in range(0, EPOCHS):
 
         accuracy = float(num_correct) / float(num_seen)
         print(f"Epoch {epoch} | Accuracy: {accuracy}")
+    torch.save(myModel, f"models/{model_path}_{epoch}.pth")
