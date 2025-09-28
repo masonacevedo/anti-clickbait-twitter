@@ -43,7 +43,7 @@ class TweetDataset(Dataset):
         if 'pixel_values' not in encoding:
             encoding['pixel_values'] = torch.zeros(1, 3, 224, 224)
         encoding['has_image'] = torch.tensor([1.0 if has_image else 0.0])
-        encoding['label'] = item.get('score')
+        encoding['label'] = torch.tensor(int(item.get('score')), dtype=torch.long)
         return encoding
 
 if __name__ == "__main__":
