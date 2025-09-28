@@ -31,7 +31,7 @@ print(f"Trainable parameters: {trainable_params:,}")
 print(f"Total parameters: {total_params:,}")
 print(f"Percentage trainable: {100 * trainable_params / total_params:.2f}%")
 
-loss_function = nn.CrossEntropyLoss()
+loss_function = nn.CrossEntropyLoss(torch.tensor([0.06429943951, 0.6116484183, 0.3240521422], dtype=torch.float32).to(device))
 optimizer = torch.optim.Adam(myModel.parameters(), lr=1e-3)
 
 file_path = "../labeled_tweets.json"
