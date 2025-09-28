@@ -7,6 +7,7 @@ import torch.nn as nn
 from Custom_CLIP_model import CustomCLIPModel
 from torch.utils.data import random_split, DataLoader
 from tweet_dataset import TweetDataset
+import time
 
 
 
@@ -47,11 +48,17 @@ validation_dataset = DataLoader(validation_data, batch_size=16, shuffle=True)
 #     print("model(**item[1]):", myModel(item[1]))
 #     input("Press Enter to continue...")
 
-EPOCHS = 10
-
+last_time = time.time()
+EPOCHS = 5
 myModel.train()
 for epoch in range(0, EPOCHS):
-    for data in training_dataset:
+    if (time.time() - last_time) > 30:
+        last_time = time.time()
+        # print(f"Epoch {epoch} | Batch {batch} | Loss: {loss.item()}")
+        print(f"Epoch {epoch} | Loss: {loss.item()}")
+
+    for index, data in enumerate(training_dataset):
+        # if index
         # input_tokens = data.get('input_ids')
         # attention_masks = data.get('attention_mask')
         # pixel_values = data.get('pixel_values')
