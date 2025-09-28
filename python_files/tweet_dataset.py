@@ -43,12 +43,13 @@ class TweetDataset(Dataset):
         if 'pixel_values' not in encoding:
             encoding['pixel_values'] = torch.zeros(1, 3, 224, 224)
         encoding['has_image'] = torch.tensor([1.0 if has_image else 0.0])
+        encoding['label'] = item.get('score')
         return encoding
 
 if __name__ == "__main__":
     CLIPProcessor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
     model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-    dataset = TweetDataset("../bookmarked_tweets_v5.json", CLIPProcessor)
+    dataset = TweetDataset("../labeled_tweets.json", CLIPProcessor)
     for item in dataset:
         print("item:", item)
         # Extract only the fields that CLIP model expects
