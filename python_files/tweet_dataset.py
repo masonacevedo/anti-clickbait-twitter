@@ -28,7 +28,7 @@ class TweetDataset(Dataset):
                 image = Image.open(image_location)
                 has_image = True
             except FileNotFoundError:
-                print(f"Image {image_location} not found")
+                # print(f"Image {image_location} not found")
                 image = None
         else:
             image = None

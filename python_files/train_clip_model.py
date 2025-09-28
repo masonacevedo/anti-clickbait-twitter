@@ -84,8 +84,6 @@ for epoch in range(0, EPOCHS):
 
             logits = myModel(**inputs)
             predictions = torch.argmax(logits, dim=1)
-            print("predictions:", predictions)
-            print("labels:", labels)
 
             num_correct += (predictions == labels).sum().item()
             num_seen += labels.size(0)
