@@ -1,6 +1,6 @@
 console.log("Anti-Clickbait Twitter Extension loaded!");
-async function evaluateText(text) {
-    let data = {"text": text};
+async function evaluateText(text, image_link) {
+    let data = {"text": text, "image_link": image_link};
     const response = await fetch('http://127.0.0.1:5000/evaluate', {
         method: 'POST',
         headers: {
@@ -48,13 +48,13 @@ async function processTweet(article) {
             return false;
         }
         if (img.src.includes('media/')){
-            images.push(img.src)
+            image_links.push(img.src)
         }
     });
     const image_link = image_links[0];
     if (tweetTextElement){
         let extractedText = tweetTextElement.textContent.trim();
-        const res = await evaluateText(extractedText);
+        const res = await evaluateText(extractedText, image_link);
         return res;
     } else {
         return 0;
