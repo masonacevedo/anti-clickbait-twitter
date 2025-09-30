@@ -42,8 +42,16 @@ async function processTweet(article) {
     const tweetTextElement = article.querySelector('[data-testid="tweetText"]');
     await waitForImages(article);
     const imgElements = article.querySelectorAll('img');
-    console.log('image elements:', imgElements);
-
+    let image_links = [];
+    imgElements.forEach(img => {
+        if (img.src.includes("profile_image")){
+            return false;
+        }
+        if (img.src.includes('media/')){
+            images.push(img.src)
+        }
+    });
+    const image_link = image_links[0];
     if (tweetTextElement){
         let extractedText = tweetTextElement.textContent.trim();
         const res = await evaluateText(extractedText);
