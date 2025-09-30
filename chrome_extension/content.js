@@ -16,8 +16,34 @@ async function evaluateText(text) {
     return result;
 }
 
+async function waitForImages(article, timeout = 5000) {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+        const images = article.querySelectorAll('img');
+
+        const allLoaded = Array.from(images).every(img =>
+            img.complete && img.naturalHeight !== 0 && img.src
+        );
+
+        if (images.length > 0 && allLoaded) {
+            return Array.from(images);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+
+    return Array.from(article.querySelectorAll('img')).filter(img =>
+        img.complete && img.naturalHeight !== 0
+    );
+}
+
 async function processTweet(article) {
     const tweetTextElement = article.querySelector('[data-testid="tweetText"]');
+    await waitForImages(article);
+    const imgElements = article.querySelectorAll('img');
+    console.log('image elements:', imgElements);
+
     if (tweetTextElement){
         let extractedText = tweetTextElement.textContent.trim();
         const res = await evaluateText(extractedText);
