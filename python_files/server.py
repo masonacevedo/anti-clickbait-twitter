@@ -17,7 +17,8 @@ model.eval()
 app = Flask(__name__)
 CORS(app, origins=['https://x.com', 'https://twitter.com'])
 
-def make_predction(text):
+def make_predction(text, image_link):
+    print("image_link:", image_link)
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
     inputs = {k: v.to(device) for k, v in inputs.items()}
 
@@ -35,8 +36,13 @@ def make_predction(text):
 
 @app.route('/evaluate', methods=['POST'])
 def predict():
+    print('request.json: ', request.json)
     tweet = request.json['text']
-    score = make_predction(tweet)
+    if 'image_link' in request.json:
+        image_link = request.json['image_link']
+    else:
+        image_link = None
+    score = make_predction(tweet, image_link)
     return jsonify({'score': score})
 
 if __name__ == "__main__":
