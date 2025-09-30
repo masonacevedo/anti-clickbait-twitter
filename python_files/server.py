@@ -15,7 +15,7 @@ model = model.to(device)
 model.eval()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=['https://x.com', 'https://twitter.com'])
 
 def make_predction(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
