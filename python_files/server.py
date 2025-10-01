@@ -23,11 +23,7 @@ model = model.to(device)
 model.eval()
 
 app = Flask(__name__)
-CORS(app,
-    origins=['https://x.com', 'https://twitter.com'],
-    methods=['GET', 'POST', 'OPTIONS'],
-    allow_headers=['Content-Type', 'Authorization'],
-    supports_credentials=True)
+CORS(app)
 
 import logging
 logging.basicConfig(
@@ -70,7 +66,11 @@ def make_predction(text, image_link):
     class_1_prob = probabilities[0].tolist()[1]
     class_2_prob = probabilities[0].tolist()[2]
 
-    return max(class_1_prob, class_2_prob)
+    score = max(class_1_prob, class_2_prob)
+    if score < 0.2:
+        return 0
+    else:
+        return score
 
 
 @app.route('/evaluate', methods=['POST'])
