@@ -9,7 +9,6 @@ from torchvision import transforms
 from PIL import Image
 from io import BytesIO
 
-print("what is going on here")
 
 processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
