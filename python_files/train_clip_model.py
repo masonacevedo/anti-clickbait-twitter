@@ -7,6 +7,7 @@ import torch.nn as nn
 from Custom_CLIP_model import CustomCLIPModel
 from torch.utils.data import random_split, DataLoader
 from tweet_dataset import TweetDataset
+import matplotlib.pyplot as plt
 
 
 model_path = input("Enter a name for the model:")
@@ -39,9 +40,10 @@ training_data, validation_data = random_split(all_data, [0.8, 0.2])
 training_dataset = DataLoader(training_data, batch_size=16, shuffle=True)
 validation_dataset = DataLoader(validation_data, batch_size=16, shuffle=True)
 
-EPOCHS = 5
+loss_list = []
+epoch_list = []
+EPOCHS = 40
 for epoch in range(0, EPOCHS):
-
     for index, data in enumerate(training_dataset):
         myModel.train()
 
@@ -85,3 +87,8 @@ for epoch in range(0, EPOCHS):
         accuracy = float(num_correct) / float(num_seen)
         print(f"Epoch {epoch} | Accuracy: {accuracy}")
     torch.save(myModel, f"models/{model_path}_{epoch}.pth")
+    loss_list.append(loss.item())
+    epoch_list.append(epoch)
+
+plt.plot(epoch_list, loss_list)
+plt.show()
