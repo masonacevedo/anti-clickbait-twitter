@@ -92,3 +92,4 @@ for epoch in range(0, EPOCHS):
 
 plt.plot(epoch_list, loss_list)
 plt.show()
+plt.savefig(f"models/{model_path}_loss.png")
